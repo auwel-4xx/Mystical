@@ -1,8 +1,14 @@
 package jp.reitou_mugicha.mystical.events;
+import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.component.ComponentTypes;
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.packettype.PacketTypeCommon;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetCursorItem;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPlayerInventory;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
@@ -11,13 +17,17 @@ import jp.reitou_mugicha.mystical.core.CustomEnchant;
 import jp.reitou_mugicha.mystical.core.EnchantManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public class TooltipListener extends PacketListenerAbstract {
+public class TooltipListener implements PacketListener
+{
 
     private final EnchantManager manager;
 
@@ -27,60 +37,77 @@ public class TooltipListener extends PacketListenerAbstract {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
-        if (event.getPacketType() == PacketType.Play.Server.SET_SLOT) {
-            WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(event);
-            ItemStack item = packet.getItem();
+        Player player = event.getPlayer();
+        if (player == null) return;
 
-            if (injectTooltip(item)) {
-                packet.setItem(item);
-                event.markForReEncode(true);
+        PacketTypeCommon type = event.getPacketType();
+
+        switch (type) {
+            case PacketType.Play.Server.SET_SLOT -> {
+                WrapperPlayServerSetSlot packet = new WrapperPlayServerSetSlot(event);
+                asBukkit(packet.getItem())
+                        .map(this::addDescription)
+                        .map(this::fromBukkit)
+                        .ifPresent(packet::setItem);
             }
-        } else if (event.getPacketType() == PacketType.Play.Server.WINDOW_ITEMS) {
-            WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event);
-            boolean changed = false;
-            List<ItemStack> items = packet.getItems();
-            for (ItemStack item : items) {
-                if (injectTooltip(item)) changed = true;
+            case PacketType.Play.Server.WINDOW_ITEMS -> {
+                WrapperPlayServerWindowItems packet = new WrapperPlayServerWindowItems(event);
+                packet.getItems().replaceAll(original ->
+                        asBukkit(original).map(this::addDescription).map(this::fromBukkit).orElse(original)
+                );
             }
-            if (changed) {
-                packet.setItems(items);
-                event.markForReEncode(true);
+            case PacketType.Play.Server.SET_PLAYER_INVENTORY -> {
+                WrapperPlayServerSetPlayerInventory packet = new WrapperPlayServerSetPlayerInventory(event);
+                asBukkit(packet.getStack())
+                        .map(this::addDescription)
+                        .map(this::fromBukkit)
+                        .ifPresent(packet::setStack);
             }
+            case PacketType.Play.Server.SET_CURSOR_ITEM -> {
+                WrapperPlayServerSetCursorItem packet = new WrapperPlayServerSetCursorItem(event);
+                asBukkit(packet.getStack())
+                        .map(this::addDescription)
+                        .map(this::fromBukkit)
+                        .ifPresent(packet::setStack);
+            }
+            default -> { return; }
         }
+
+        event.markForReEncode(true);
     }
 
-    private boolean injectTooltip(ItemStack peItem) {
-        if (peItem == null || peItem.isEmpty()) return false;
+    private Optional<org.bukkit.inventory.ItemStack> asBukkit(
+            com.github.retrooper.packetevents.protocol.item.ItemStack peItem) {
+        return Optional.ofNullable(peItem).map(SpigotConversionUtil::toBukkitItemStack);
+    }
 
-        org.bukkit.inventory.ItemStack bukkitItem = SpigotConversionUtil.toBukkitItemStack(peItem);
-        if (bukkitItem == null || !bukkitItem.hasItemMeta()) return false;
+    private com.github.retrooper.packetevents.protocol.item.ItemStack fromBukkit(
+            org.bukkit.inventory.ItemStack item) {
+        return SpigotConversionUtil.fromBukkitItemStack(item);
+    }
+
+    private org.bukkit.inventory.ItemStack addDescription(org.bukkit.inventory.ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return item;
 
         List<Component> descLines = new ArrayList<>();
-        for (Map.Entry<Enchantment, Integer> entry : bukkitItem.getEnchantments().entrySet()) {
-            Enchantment enc = entry.getKey();
-            int level = entry.getValue();
-
+        for (Map.Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
             for (CustomEnchant custom : manager.getEnchants()) {
-                if (!enc.getKey().equals(custom.getKey())) continue;
-                Component desc = custom.getTooltipDescription(level);
+                if (!entry.getKey().getKey().equals(custom.getKey())) continue;
+                Component desc = custom.getTooltipDescription(entry.getValue());
                 if (!Component.empty().equals(desc)) {
-                    descLines.add(desc.color(NamedTextColor.GRAY));
+                    descLines.add(desc.color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
                 }
             }
         }
 
-        if (descLines.isEmpty()) return false;
+        if (descLines.isEmpty()) return item;
 
-        org.bukkit.inventory.meta.ItemMeta meta = bukkitItem.getItemMeta();
+        org.bukkit.inventory.ItemStack clone = item.clone();
+        org.bukkit.inventory.meta.ItemMeta meta = clone.getItemMeta();
         List<Component> lore = meta.lore() != null ? new ArrayList<>(meta.lore()) : new ArrayList<>();
         lore.addAll(0, descLines);
         meta.lore(lore);
-        bukkitItem.setItemMeta(meta);
-
-        ItemStack converted = SpigotConversionUtil.fromBukkitItemStack(bukkitItem);
-        peItem.setNBT(converted.getNBT());
-        peItem.setAmount(converted.getAmount());
-
-        return true;
+        clone.setItemMeta(meta);
+        return clone;
     }
 }

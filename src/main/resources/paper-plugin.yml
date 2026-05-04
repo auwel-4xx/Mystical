@@ -5,6 +5,10 @@ bootstrapper: jp.reitou_mugicha.mystical.core.EnchantBootstrap
 api-version: '26.1.2'
 
 dependencies:
+  bootstrap:
+    packetevents:
+      required: false
+      load: BEFORE
   server:
     packetevents:
       required: true

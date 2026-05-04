@@ -1,6 +1,7 @@
 package jp.reitou_mugicha.mystical;
 
 import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import jp.reitou_mugicha.mystical.core.EnchantBootstrap;
 import jp.reitou_mugicha.mystical.events.TooltipListener;
@@ -29,13 +30,13 @@ public final class Mystical extends JavaPlugin
         getLogger().info(ChatColor.LIGHT_PURPLE + "Mystical has been enabled.");
 
         PacketEvents.getAPI().init();
+        PacketEvents.getAPI().getEventManager().registerListener(
+                new TooltipListener(EnchantBootstrap.MANAGER),
+                PacketListenerPriority.NORMAL
+        );
 
         EnchantBootstrap.MANAGER.registerListener(this);
         EnchantBootstrap.MANAGER.startTick(this);
-
-        PacketEvents.getAPI().getEventManager().registerListener(
-                new TooltipListener(EnchantBootstrap.MANAGER)
-        );
     }
 
     @Override
