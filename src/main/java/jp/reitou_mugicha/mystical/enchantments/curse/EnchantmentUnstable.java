@@ -48,6 +48,12 @@ public class EnchantmentUnstable extends CustomEnchant
     }
 
     @Override
+    public boolean isCurse()
+    {
+        return true;
+    }
+
+    @Override
     public void onItemDamaged(Player player, PlayerItemDamageEvent event, int level)
     {
         if (Helpers.probability(20))
