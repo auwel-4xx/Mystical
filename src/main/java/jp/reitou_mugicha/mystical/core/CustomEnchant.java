@@ -49,9 +49,9 @@ public abstract class CustomEnchant
 
     public void onTick(Player player, ItemStack itemStack, int level) {}
     public void onHit(Player attacker, EntityDamageByEntityEvent event, int level) {}
-    public void onDamaged(Player victim, EntityDamageByEntityEvent event, int level) {}
-
-    public void onEntityDamaged(ItemStack itemStack, EntityDamageEvent event, int level) {}
+    public void onDamaged(Player victim, EntityDamageEvent event, int level) {}
+    public void onDamagedByEntity(Player victim, EntityDamageByEntityEvent event, int level) {}
+    public void onItemEntityDamaged(ItemStack itemStack, EntityDamageEvent event, int level) {}
     public void onKill(Player player, EntityDeathEvent event, int level) {}
     public void onDeath(Player player, ItemStack itemStack, PlayerDeathEvent event, int level) {}
     public void onMove(Player player, PlayerMoveEvent event, int level) {}

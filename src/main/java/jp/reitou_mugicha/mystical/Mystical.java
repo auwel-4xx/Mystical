@@ -46,7 +46,7 @@ public final class Mystical extends JavaPlugin
         PacketEvents.getAPI().terminate();
     }
 
-    public Plugin getInstance()
+    public static Plugin getInstance()
     {
         return Instance;
     }

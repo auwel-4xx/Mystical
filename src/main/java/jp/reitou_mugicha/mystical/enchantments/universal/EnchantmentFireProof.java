@@ -46,7 +46,7 @@ public class EnchantmentFireProof extends CustomEnchant
     }
 
     @Override
-    public void onEntityDamaged(ItemStack itemStack, EntityDamageEvent event, int level)
+    public void onItemEntityDamaged(ItemStack itemStack, EntityDamageEvent event, int level)
     {
         if (event.getCause() == EntityDamageEvent.DamageCause.LAVA ||
             event.getCause() == EntityDamageEvent.DamageCause.FIRE ||

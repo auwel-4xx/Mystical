@@ -4,6 +4,7 @@ import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
 import io.papermc.paper.registry.event.RegistryComposeEvent;
 import io.papermc.paper.registry.event.RegistryEntryAddEvent;
 import io.papermc.paper.registry.keys.EnchantmentKeys;
+import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentFlameWalker;
 import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
 import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
@@ -42,7 +43,8 @@ public class EnchantManager implements Listener
             new EnchantmentPoisonAspect(),
             new EnchantmentFireProof(),
             new EnchantmentSoulbound(),
-            new EnchantmentUnstable()
+            new EnchantmentUnstable(),
+            new EnchantmentFlameWalker()
         );
     }
 
@@ -86,7 +88,19 @@ public class EnchantManager implements Listener
     }
 
     @EventHandler
-    public void onDamaged(EntityDamageByEntityEvent event) {
+    public void onDamagedByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player victim)) return;
+        ItemStack armor = victim.getInventory().getChestplate();
+
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(armor);
+            if (level > 0) enchant.onDamagedByEntity(victim, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onDamaged(EntityDamageEvent event)
+    {
         if (!(event.getEntity() instanceof Player victim)) return;
         ItemStack armor = victim.getInventory().getChestplate();
 
@@ -97,12 +111,12 @@ public class EnchantManager implements Listener
     }
 
     @EventHandler
-    public void onEntityDamaged(EntityDamageEvent event)
+    public void onItemEntityDamaged(EntityDamageEvent event)
     {
         if (!(event.getEntity() instanceof Item item)) return;
         for (CustomEnchant enchant : enchants) {
             int level = enchant.getLevel(item.getItemStack());
-            if (level > 0) enchant.onEntityDamaged(item.getItemStack(), event, level);
+            if (level > 0) enchant.onItemEntityDamaged(item.getItemStack(), event, level);
         }
     }
 
