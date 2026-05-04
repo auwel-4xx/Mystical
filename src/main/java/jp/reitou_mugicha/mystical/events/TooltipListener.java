@@ -105,7 +105,7 @@ public class TooltipListener implements PacketListener
         org.bukkit.inventory.ItemStack clone = item.clone();
         org.bukkit.inventory.meta.ItemMeta meta = clone.getItemMeta();
         List<Component> lore = meta.lore() != null ? new ArrayList<>(meta.lore()) : new ArrayList<>();
-        lore.addAll(0, descLines);
+        lore.addAll(descLines);
         meta.lore(lore);
         clone.setItemMeta(meta);
         return clone;
