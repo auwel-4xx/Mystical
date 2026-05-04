@@ -1,0 +1,11 @@
+name: Mystical
+version: '1.0.0'
+main: jp.reitou_mugicha.mystical.Mystical
+bootstrapper: jp.reitou_mugicha.mystical.core.EnchantBootstrap
+api-version: '26.1.2'
+
+dependencies:
+  server:
+    packetevents:
+      required: true
+      load: BEFORE

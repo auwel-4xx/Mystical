@@ -1,0 +1,186 @@
+package jp.reitou_mugicha.mystical.core;
+
+import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
+import io.papermc.paper.registry.event.RegistryComposeEvent;
+import io.papermc.paper.registry.event.RegistryEntryAddEvent;
+import io.papermc.paper.registry.keys.EnchantmentKeys;
+import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
+import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
+import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
+import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentSoulbound;
+import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentPoisonAspect;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.EquipmentSlotGroup;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class EnchantManager implements Listener
+{
+    private final List<CustomEnchant> enchants;
+
+    public EnchantManager()
+    {
+        this.enchants = List.of(
+            new EnchantmentTelepathy(),
+            new EnchantmentPoisonAspect(),
+            new EnchantmentFireProof(),
+            new EnchantmentSoulbound(),
+            new EnchantmentUnstable()
+        );
+    }
+
+    public List<CustomEnchant> getEnchants()
+    {
+        return this.enchants;
+    }
+
+    public void registerListener(Plugin plugin) {
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    public void startTick(Plugin plugin) {
+        plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            List<CustomEnchant> tickEnchants = enchants.stream()
+                    .filter(CustomEnchant::hasTick)
+                    .toList();
+
+            if (tickEnchants.isEmpty()) return;
+
+            for (Player player : plugin.getServer().getOnlinePlayers()) {
+                ItemStack item = player.getInventory().getItemInMainHand();
+
+                for (CustomEnchant enchant : tickEnchants) {
+                    int level = enchant.getLevel(item);
+                    if (level > 0) enchant.onTick(player, item, level);
+                }
+            }
+        }, 0L, 1L);
+    }
+
+    @EventHandler
+    public void onHit(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player attacker)) return;
+        ItemStack item = attacker.getInventory().getItemInMainHand();
+
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(item);
+            if (level > 0) enchant.onHit(attacker, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onDamaged(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player victim)) return;
+        ItemStack armor = victim.getInventory().getChestplate();
+
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(armor);
+            if (level > 0) enchant.onDamaged(victim, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamaged(EntityDamageEvent event)
+    {
+        if (!(event.getEntity() instanceof Item item)) return;
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(item.getItemStack());
+            if (level > 0) enchant.onEntityDamaged(item.getItemStack(), event, level);
+        }
+    }
+
+    @EventHandler
+    public void onKill(EntityDeathEvent event) {
+        if (event.getEntity().getKiller() == null) return;
+        Player killer = event.getEntity().getKiller();
+        ItemStack item = killer.getInventory().getItemInMainHand();
+
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(item);
+            if (level > 0) enchant.onKill(killer, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event)
+    {
+        Player player = event.getPlayer();
+
+        List<ItemStack> allItems = new java.util.ArrayList<>();
+        allItems.add(player.getInventory().getItemInMainHand());
+        allItems.add(player.getInventory().getItemInOffHand());
+        allItems.add(player.getInventory().getHelmet());
+        allItems.add(player.getInventory().getChestplate());
+        allItems.add(player.getInventory().getLeggings());
+        allItems.add(player.getInventory().getBoots());
+        allItems.addAll(Arrays.asList(player.getInventory().getContents()));
+
+        for (ItemStack item : allItems) {
+            if (item == null || item.getType().isAir()) continue;
+            for (CustomEnchant enchant : enchants) {
+                int level = enchant.getLevel(item);
+                if (level > 0) enchant.onDeath(player, item, event, level);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        ItemStack boots = player.getInventory().getBoots();
+
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(boots);
+            if (level > 0) enchant.onMove(player, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event)
+    {
+        Player player = event.getPlayer();
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(mainHand);
+            if (level > 0) enchant.onBlockBreak(player, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onBlockDropItem(BlockDropItemEvent event)
+    {
+        Player player = event.getPlayer();
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(mainHand);
+            if (level > 0) enchant.onBlockDropItem(player, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerItemDamage(PlayerItemDamageEvent event)
+    {
+        Player player = event.getPlayer();
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(mainHand);
+            if (level > 0) enchant.onItemDamaged(player, event, level);
+        }
+    }
+}
