@@ -90,11 +90,20 @@ public class EnchantManager implements Listener
     @EventHandler
     public void onDamagedByEntity(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player victim)) return;
-        ItemStack armor = victim.getInventory().getChestplate();
 
-        for (CustomEnchant enchant : enchants) {
-            int level = enchant.getLevel(armor);
-            if (level > 0) enchant.onDamagedByEntity(victim, event, level);
+        List<ItemStack> armors = List.of(
+                victim.getInventory().getHelmet(),
+                victim.getInventory().getChestplate(),
+                victim.getInventory().getLeggings(),
+                victim.getInventory().getBoots()
+        );
+
+        for (ItemStack armor : armors) {
+            if (armor == null || armor.getType().isAir()) continue;
+            for (CustomEnchant enchant : enchants) {
+                int level = enchant.getLevel(armor);
+                if (level > 0) enchant.onDamagedByEntity(victim, event, level);
+            }
         }
     }
 
@@ -102,11 +111,20 @@ public class EnchantManager implements Listener
     public void onDamaged(EntityDamageEvent event)
     {
         if (!(event.getEntity() instanceof Player victim)) return;
-        ItemStack armor = victim.getInventory().getChestplate();
 
-        for (CustomEnchant enchant : enchants) {
-            int level = enchant.getLevel(armor);
-            if (level > 0) enchant.onDamaged(victim, event, level);
+        List<ItemStack> armors = List.of(
+                victim.getInventory().getHelmet(),
+                victim.getInventory().getChestplate(),
+                victim.getInventory().getLeggings(),
+                victim.getInventory().getBoots()
+        );
+
+        for (ItemStack armor : armors) {
+            if (armor == null || armor.getType().isAir()) continue;
+            for (CustomEnchant enchant : enchants) {
+                int level = enchant.getLevel(armor);
+                if (level > 0) enchant.onDamaged(victim, event, level);
+            }
         }
     }
 

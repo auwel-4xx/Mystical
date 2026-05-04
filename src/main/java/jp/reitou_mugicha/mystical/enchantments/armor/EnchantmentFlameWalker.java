@@ -99,8 +99,10 @@ public class EnchantmentFlameWalker extends CustomEnchant
     @Override
     public void onDamaged(Player victim, EntityDamageEvent event, int level)
     {
-        if (event.getCause() != EntityDamageEvent.DamageCause.HOT_FLOOR) return;
-        event.setCancelled(true);
+        if (event.getCause() == EntityDamageEvent.DamageCause.HOT_FLOOR)
+        {
+            event.setCancelled(true);
+        }
     }
 
     private Set<Block> replaceLava(Player player, int radius) {
