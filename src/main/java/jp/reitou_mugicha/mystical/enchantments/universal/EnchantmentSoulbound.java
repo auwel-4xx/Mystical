@@ -56,7 +56,7 @@ public class EnchantmentSoulbound extends CustomEnchant
             for(CustomEnchant enchant : EnchantBootstrap.MANAGER.getEnchants())
             {
                 int enchantLevel = enchant.getLevel(item);
-                if (enchantLevel > 0)
+                if (enchantLevel > 0 && enchant.getKey() == new EnchantmentSoulbound().getKey())
                 {
                     itemsToKeep.add(item);
                     return true;
