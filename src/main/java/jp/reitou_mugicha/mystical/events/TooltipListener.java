@@ -30,6 +30,7 @@ public class TooltipListener implements PacketListener
 {
 
     private final EnchantManager manager;
+    private static final String DESCRIPTION_MARKER = "mystical:enchant_desc";
 
     public TooltipListener(EnchantManager manager) {
         this.manager = manager;
@@ -89,25 +90,35 @@ public class TooltipListener implements PacketListener
     private org.bukkit.inventory.ItemStack addDescription(org.bukkit.inventory.ItemStack item) {
         if (item == null || !item.hasItemMeta()) return item;
 
+        org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+        List<Component> lore = meta.lore() != null ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+
+        lore.removeIf(this::isDescriptionLine);
+
         List<Component> descLines = new ArrayList<>();
-        for (Map.Entry<Enchantment, Integer> entry : item.getEnchantments().entrySet()) {
-            for (CustomEnchant custom : manager.getEnchants()) {
-                if (!entry.getKey().getKey().equals(custom.getKey())) continue;
-                Component desc = custom.getTooltipDescription(entry.getValue());
-                if (!Component.empty().equals(desc)) {
-                    descLines.add(desc.color(NamedTextColor.DARK_GRAY).decoration(TextDecoration.ITALIC, false));
-                }
-            }
+        for (CustomEnchant custom : manager.getEnchants()) {
+            int level = custom.getLevel(item);
+            if (level == 0) continue;
+
+            Component desc = custom.getTooltipDescription(level)
+                    .color(NamedTextColor.DARK_GRAY)
+                    .decoration(TextDecoration.ITALIC, false)
+                    .insertion(DESCRIPTION_MARKER);
+            descLines.add(desc);
         }
 
         if (descLines.isEmpty()) return item;
 
-        org.bukkit.inventory.ItemStack clone = item.clone();
-        org.bukkit.inventory.meta.ItemMeta meta = clone.getItemMeta();
-        List<Component> lore = meta.lore() != null ? new ArrayList<>(meta.lore()) : new ArrayList<>();
         lore.addAll(descLines);
-        meta.lore(lore);
-        clone.setItemMeta(meta);
+
+        org.bukkit.inventory.ItemStack clone = item.clone();
+        org.bukkit.inventory.meta.ItemMeta cloneMeta = clone.getItemMeta();
+        cloneMeta.lore(lore);
+        clone.setItemMeta(cloneMeta);
         return clone;
+    }
+
+    private boolean isDescriptionLine(Component component) {
+        return DESCRIPTION_MARKER.equals(component.insertion());
     }
 }
