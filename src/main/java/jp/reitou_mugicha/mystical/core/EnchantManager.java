@@ -9,6 +9,7 @@ import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
 import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentSoulbound;
+import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentLifeSteal;
 import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentPoisonAspect;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -44,7 +45,8 @@ public class EnchantManager implements Listener
             new EnchantmentFireProof(),
             new EnchantmentSoulbound(),
             new EnchantmentUnstable(),
-            new EnchantmentFlameWalker()
+            new EnchantmentFlameWalker(),
+            new EnchantmentLifeSteal()
         );
     }
 

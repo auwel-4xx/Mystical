@@ -14,4 +14,5 @@ public class ItemTagHelper
     public static final TagKey<ItemType> TOOLS = TagKey.create(RegistryKey.ITEM, Key.key("mystical", "tools"));
     public static final TagKey<ItemType> ARMORS = TagKey.create(RegistryKey.ITEM, Key.key("mystical", "armors"));
     public static final TagKey<ItemType> ALL = TagKey.create(RegistryKey.ITEM, Key.key("mystical", "all"));
+    public static final TagKey<ItemType> ATTACKS = TagKey.create(RegistryKey.ITEM, Key.key("mystical", "attacks"));
 }
