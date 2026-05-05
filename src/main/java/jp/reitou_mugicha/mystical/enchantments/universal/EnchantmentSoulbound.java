@@ -7,6 +7,7 @@ import jp.reitou_mugicha.mystical.core.EnchantBootstrap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
@@ -49,25 +50,13 @@ public class EnchantmentSoulbound extends CustomEnchant
     @Override
     public void onDeath(Player player, ItemStack itemStack, PlayerDeathEvent event, int level)
     {
-        List<ItemStack> drops = event.getDrops();
-        List<ItemStack> itemsToKeep = new ArrayList<>();
-
-        drops.removeIf(item -> {
-            for(CustomEnchant enchant : EnchantBootstrap.MANAGER.getEnchants())
-            {
-                int enchantLevel = enchant.getLevel(item);
-                if (enchantLevel > 0 && enchant.getKey() == new EnchantmentSoulbound().getKey())
-                {
-                    itemsToKeep.add(item);
-                    return true;
-                }
+        event.getDrops().removeIf(item -> {
+            int lvl = getLevel(item);
+            if (lvl > 0) {
+                event.getItemsToKeep().add(item);
+                return true;
             }
             return false;
         });
-
-        if (!itemsToKeep.isEmpty())
-        {
-            event.getItemsToKeep().addAll(itemsToKeep);
-        }
     }
 }

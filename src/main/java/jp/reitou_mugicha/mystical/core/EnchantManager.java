@@ -222,9 +222,12 @@ public class EnchantManager implements Listener
     @EventHandler
     public void onChangeBlock(EntityChangeBlockEvent event)
     {
-        LivingEntity entity = (LivingEntity) event.getEntity();
+        if (!(event.getEntity() instanceof LivingEntity entity)) return;
+        if (entity.getEquipment() == null) return;
+
         ItemStack foot = entity.getEquipment().getBoots();
-        if (foot == null) return;
+        if (foot == null || foot.getType().isAir()) return;
+
         for (CustomEnchant enchant : enchants) {
             int level = enchant.getLevel(foot);
             if (level > 0) enchant.onChangeBlock(entity, event, level);
