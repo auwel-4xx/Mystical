@@ -6,6 +6,7 @@ import jp.reitou_mugicha.mystical.core.CustomEnchant;
 import jp.reitou_mugicha.mystical.core.EnchantBootstrap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
