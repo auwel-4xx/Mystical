@@ -47,7 +47,7 @@ public class EnchantmentLifeSteal extends CustomEnchant
     public void onHit(Player attacker, EntityDamageByEntityEvent event, int level)
     {
         double damage = event.getFinalDamage();
-        double healAmount = damage * (level * 0.5);
+        double healAmount = damage * (level * 0.3);
 
         double newHealth = Math.min(
                 attacker.getHealth() + healAmount,
