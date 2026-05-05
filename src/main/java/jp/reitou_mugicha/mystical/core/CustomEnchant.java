@@ -10,13 +10,12 @@ import io.papermc.paper.registry.tag.TagKey;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -58,6 +57,8 @@ public abstract class CustomEnchant
     public void onBlockBreak(Player player, BlockBreakEvent event, int level) {}
     public void onBlockDropItem(Player player, BlockDropItemEvent event, int level) {}
     public void onItemDamaged(Player player, PlayerItemDamageEvent event, int level) {}
+    public void onChangeBlock(LivingEntity entity, EntityChangeBlockEvent event, int level) {}
+    public void onPlayerInteract(Player player, PlayerInteractEvent event, int level) {}
 
     public boolean hasTick() { return false; }
     public boolean isCurse() { return false; }

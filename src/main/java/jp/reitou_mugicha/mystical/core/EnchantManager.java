@@ -10,6 +10,7 @@ import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentSoulbound;
 import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentLifeSteal;
+import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentLightweight;
 import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentPoisonAspect;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
@@ -20,10 +21,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
@@ -46,7 +45,8 @@ public class EnchantManager implements Listener
             new EnchantmentSoulbound(),
             new EnchantmentUnstable(),
             new EnchantmentFlameWalker(),
-            new EnchantmentLifeSteal()
+            new EnchantmentLifeSteal(),
+            new EnchantmentLightweight()
         );
     }
 
@@ -216,6 +216,29 @@ public class EnchantManager implements Listener
         for (CustomEnchant enchant : enchants) {
             int level = enchant.getLevel(mainHand);
             if (level > 0) enchant.onItemDamaged(player, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onChangeBlock(EntityChangeBlockEvent event)
+    {
+        LivingEntity entity = (LivingEntity) event.getEntity();
+        ItemStack foot = entity.getEquipment().getBoots();
+        if (foot == null) return;
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(foot);
+            if (level > 0) enchant.onChangeBlock(entity, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event)
+    {
+        Player player = event.getPlayer();
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(mainHand);
+            if (level > 0) enchant.onPlayerInteract(player, event, level);
         }
     }
 }
