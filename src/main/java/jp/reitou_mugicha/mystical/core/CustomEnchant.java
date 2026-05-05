@@ -61,6 +61,9 @@ public abstract class CustomEnchant
 
     public boolean hasTick() { return false; }
     public boolean isCurse() { return false; }
+    public boolean isTradeable()    { return true; }
+    public boolean isOnRandomLoot() { return true; }
+    public boolean isTreasure()     { return false; }
     public RegistryKeySet<Enchantment> getExclusiveWith() { return RegistrySet.keySet(RegistryKey.ENCHANTMENT); }
 
     public Enchantment getBukkitEnchantment()

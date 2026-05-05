@@ -84,8 +84,17 @@ public class EnchantBootstrap implements PluginBootstrap {
 
                 if (enchant.isCurse()) {
                     registrar.addToTag(EnchantmentTagKeys.CURSE, entry);
-                } else {
+                } else if (!enchant.isTreasure()) {
                     registrar.addToTag(EnchantmentTagKeys.IN_ENCHANTING_TABLE, entry);
+                }
+
+                if (enchant.isTradeable()) {
+                    registrar.addToTag(EnchantmentTagKeys.TRADEABLE, entry);
+                    registrar.addToTag(EnchantmentTagKeys.DOUBLE_TRADE_PRICE, entry); // 呪いなら価格2倍
+                }
+
+                if (enchant.isOnRandomLoot()) {
+                    registrar.addToTag(EnchantmentTagKeys.ON_RANDOM_LOOT, entry);
                 }
             }
         }));
