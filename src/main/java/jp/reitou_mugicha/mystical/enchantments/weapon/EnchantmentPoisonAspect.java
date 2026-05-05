@@ -39,6 +39,7 @@ public class EnchantmentPoisonAspect extends CustomEnchant
     public TagKey<ItemType> getSupportedItems()
     {
         return ItemTagHelper.ATTACKS;
+    }
 
     @Override
     public Component getTooltipDescription(int level)
