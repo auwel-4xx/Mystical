@@ -152,7 +152,7 @@ public class EnchantManager implements Listener
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler()
     public void onDeath(PlayerDeathEvent event)
     {
         Player player = event.getPlayer();
