@@ -1,4 +1,4 @@
-package jp.reitou_mugicha.mystical.enchantments.weapon;
+package jp.reitou_mugicha.mystical.enchantments.armor;
 
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.tag.TagKey;
