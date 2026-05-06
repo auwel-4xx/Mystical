@@ -1,23 +1,18 @@
 package jp.reitou_mugicha.mystical.core;
 
-import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
-import io.papermc.paper.registry.event.RegistryComposeEvent;
-import io.papermc.paper.registry.event.RegistryEntryAddEvent;
-import io.papermc.paper.registry.keys.EnchantmentKeys;
 import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentFlameWalker;
+import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentNightvision;
 import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
 import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentSoulbound;
 import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentLifeSteal;
-import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentLightweight;
+import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentLightweight;
 import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentPoisonAspect;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
@@ -25,10 +20,10 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +41,8 @@ public class EnchantManager implements Listener
             new EnchantmentUnstable(),
             new EnchantmentFlameWalker(),
             new EnchantmentLifeSteal(),
-            new EnchantmentLightweight()
+            new EnchantmentLightweight(),
+            new EnchantmentNightvision()
         );
     }
 
@@ -68,11 +64,20 @@ public class EnchantManager implements Listener
             if (tickEnchants.isEmpty()) return;
 
             for (Player player : plugin.getServer().getOnlinePlayers()) {
-                ItemStack item = player.getInventory().getItemInMainHand();
+                List<ItemStack> items = new ArrayList<>();
+                items.add(player.getInventory().getItemInMainHand());
+                items.add(player.getInventory().getItemInOffHand());
+                items.add(player.getInventory().getHelmet());
+                items.add(player.getInventory().getChestplate());
+                items.add(player.getInventory().getLeggings());
+                items.add(player.getInventory().getBoots());
 
-                for (CustomEnchant enchant : tickEnchants) {
-                    int level = enchant.getLevel(item);
-                    if (level > 0) enchant.onTick(player, item, level);
+                for (ItemStack item : items) {
+                    if (item == null || item.getType().isAir()) continue;
+                    for (CustomEnchant enchant : tickEnchants) {
+                        int level = enchant.getLevel(item);
+                        if (level > 0) enchant.onTick(player, item, level);
+                    }
                 }
             }
         }, 0L, 1L);
