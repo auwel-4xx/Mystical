@@ -2,6 +2,7 @@ package jp.reitou_mugicha.mystical.core;
 
 import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentFlameWalker;
 import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentNightvision;
+import jp.reitou_mugicha.mystical.enchantments.bow.EnchantmentSniper;
 import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
 import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
@@ -42,7 +43,8 @@ public class EnchantManager implements Listener
             new EnchantmentFlameWalker(),
             new EnchantmentLifeSteal(),
             new EnchantmentLightweight(),
-            new EnchantmentNightvision()
+            new EnchantmentNightvision(),
+            new EnchantmentSniper()
         );
     }
 
@@ -247,6 +249,17 @@ public class EnchantManager implements Listener
         for (CustomEnchant enchant : enchants) {
             int level = enchant.getLevel(mainHand);
             if (level > 0) enchant.onPlayerInteract(player, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onShoot(EntityShootBowEvent event)
+    {
+        LivingEntity entity = event.getEntity();
+        ItemStack itemStack = event.getBow();
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(itemStack);
+            if (level > 0) enchant.onShoot(entity, event, level);
         }
     }
 }

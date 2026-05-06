@@ -59,6 +59,7 @@ public abstract class CustomEnchant
     public void onItemDamaged(Player player, PlayerItemDamageEvent event, int level) {}
     public void onChangeBlock(LivingEntity entity, EntityChangeBlockEvent event, int level) {}
     public void onPlayerInteract(Player player, PlayerInteractEvent event, int level) {}
+    public void onShoot(LivingEntity entity, EntityShootBowEvent event, int level) {}
 
     public boolean hasTick() { return false; }
     public boolean isCurse() { return false; }
