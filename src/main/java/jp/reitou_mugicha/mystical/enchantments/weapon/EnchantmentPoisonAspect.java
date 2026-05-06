@@ -50,6 +50,8 @@ public class EnchantmentPoisonAspect extends CustomEnchant
     @Override
     public void onHit(Player attacker, EntityDamageByEntityEvent event, int level)
     {
+        if (getLevel(attacker.getInventory().getItemInMainHand()) <= 0) return;
+
         LivingEntity victim = (LivingEntity)event.getEntity();
         victim.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 40 + level * 20, level - 1));
     }
