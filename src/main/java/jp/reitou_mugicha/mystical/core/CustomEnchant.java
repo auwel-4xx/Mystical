@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -60,6 +61,7 @@ public abstract class CustomEnchant
     public void onChangeBlock(LivingEntity entity, EntityChangeBlockEvent event, int level) {}
     public void onPlayerInteract(Player player, PlayerInteractEvent event, int level) {}
     public void onShoot(LivingEntity entity, EntityShootBowEvent event, int level) {}
+    public void onFish(Player player, PlayerFishEvent event, int level) {}
 
     public boolean hasTick() { return false; }
     public boolean isCurse() { return false; }
@@ -79,5 +81,12 @@ public abstract class CustomEnchant
         Enchantment enchantment = getBukkitEnchantment();
         if (enchantment == null) return 0;
         return itemStack.getEnchantmentLevel(enchantment);
+    }
+
+    public boolean canEnchant(ItemStack item) {
+        if (item == null || item.getType().isAir()) return false;
+        Enchantment enc = getBukkitEnchantment();
+        if (enc == null) return false;
+        return enc.canEnchantItem(item);
     }
 }

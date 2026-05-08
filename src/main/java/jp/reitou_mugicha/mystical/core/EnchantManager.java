@@ -4,6 +4,7 @@ import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentFlameWalker;
 import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentNightvision;
 import jp.reitou_mugicha.mystical.enchantments.bow.EnchantmentSniper;
 import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
+import jp.reitou_mugicha.mystical.enchantments.fishing.EnchantmentLongThrow;
 import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentSoulbound;
@@ -18,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -44,7 +46,8 @@ public class EnchantManager implements Listener
             new EnchantmentLifeSteal(),
             new EnchantmentLightweight(),
             new EnchantmentNightvision(),
-            new EnchantmentSniper()
+            new EnchantmentSniper(),
+            new EnchantmentLongThrow()
         );
     }
 
@@ -260,6 +263,17 @@ public class EnchantManager implements Listener
         for (CustomEnchant enchant : enchants) {
             int level = enchant.getLevel(itemStack);
             if (level > 0) enchant.onShoot(entity, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onFish(PlayerFishEvent event)
+    {
+        Player player = event.getPlayer();
+        ItemStack fishingRod = player.getInventory().getItemInMainHand();
+        for (CustomEnchant enchant : enchants) {
+            int level = enchant.getLevel(fishingRod);
+            if (level > 0) enchant.onFish(player, event, level);
         }
     }
 }
