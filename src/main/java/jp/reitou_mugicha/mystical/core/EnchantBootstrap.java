@@ -60,6 +60,10 @@ public class EnchantBootstrap implements PluginBootstrap {
                     TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft", "swords"))),
                     TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft", "axes")))
             ));
+
+            registrar.addToTag(ItemTagHelper.SHIELD, List.of(
+                    TagEntry.valueEntry(TypedKey.create(RegistryKey.ITEM, Key.key("minecraft", "shield")))
+            ));
         }));
 
         // Register Enchants

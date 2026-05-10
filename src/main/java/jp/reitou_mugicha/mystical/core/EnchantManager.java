@@ -5,6 +5,7 @@ import jp.reitou_mugicha.mystical.enchantments.armor.EnchantmentNightvision;
 import jp.reitou_mugicha.mystical.enchantments.bow.EnchantmentSniper;
 import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
 import jp.reitou_mugicha.mystical.enchantments.fishing.EnchantmentLongThrow;
+import jp.reitou_mugicha.mystical.enchantments.shield.EnchantmentRebound;
 import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentSoulbound;
@@ -47,7 +48,8 @@ public class EnchantManager implements Listener
             new EnchantmentLightweight(),
             new EnchantmentNightvision(),
             new EnchantmentSniper(),
-            new EnchantmentLongThrow()
+            new EnchantmentLongThrow(),
+            new EnchantmentRebound()
         );
     }
 
@@ -275,6 +277,27 @@ public class EnchantManager implements Listener
         for (CustomEnchant enchant : enchants) {
             int level = enchant.getLevel(fishingRod);
             if (level > 0) enchant.onFish(player, event, level);
+        }
+    }
+
+    @EventHandler
+    public void onShieldBlock(EntityDamageByEntityEvent event)
+    {
+        if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
+            if (!(event.getEntity() instanceof Player player)) return;
+            List<ItemStack> items = List.of(
+                player.getInventory().getItemInMainHand(),
+                player.getInventory().getItemInOffHand()
+            );
+
+            for (ItemStack item : items)
+            {
+                if (item == null || item.getType().isAir()) continue;
+                for (CustomEnchant enchant : enchants) {
+                    int level = enchant.getLevel(item);
+                    if (level > 0) enchant.onShieldBlock(player, event, level);
+                }
+            }
         }
     }
 }
