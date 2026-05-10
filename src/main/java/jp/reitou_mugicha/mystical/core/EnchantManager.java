@@ -7,6 +7,7 @@ import jp.reitou_mugicha.mystical.enchantments.curse.EnchantmentUnstable;
 import jp.reitou_mugicha.mystical.enchantments.fishing.EnchantmentLongThrow;
 import jp.reitou_mugicha.mystical.enchantments.shield.EnchantmentRebound;
 import jp.reitou_mugicha.mystical.enchantments.tool.EnchantmentTelepathy;
+import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentExperience;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentFireProof;
 import jp.reitou_mugicha.mystical.enchantments.universal.EnchantmentSoulbound;
 import jp.reitou_mugicha.mystical.enchantments.weapon.EnchantmentLifeSteal;
@@ -49,7 +50,8 @@ public class EnchantManager implements Listener
             new EnchantmentNightvision(),
             new EnchantmentSniper(),
             new EnchantmentLongThrow(),
-            new EnchantmentRebound()
+            new EnchantmentRebound(),
+            new EnchantmentExperience()
         );
     }
 
