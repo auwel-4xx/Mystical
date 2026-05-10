@@ -222,9 +222,10 @@ public class EnchantManager implements Listener
     public void onPlayerItemDamage(PlayerItemDamageEvent event)
     {
         Player player = event.getPlayer();
-        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        ItemStack damagedItem = event.getItem();
+
         for (CustomEnchant enchant : enchants) {
-            int level = enchant.getLevel(mainHand);
+            int level = enchant.getLevel(damagedItem);
             if (level > 0) enchant.onItemDamaged(player, event, level);
         }
     }
