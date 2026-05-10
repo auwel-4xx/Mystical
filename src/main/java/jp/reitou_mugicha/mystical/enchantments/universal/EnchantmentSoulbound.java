@@ -51,6 +51,10 @@ public class EnchantmentSoulbound extends CustomEnchant
     @Override
     public void onDeath(Player player, ItemStack itemStack, PlayerDeathEvent event, int level)
     {
+        if (player.getKiller() != null) {
+            return;
+        }
+
         event.getDrops().removeIf(item -> {
             int lvl = getLevel(item);
             if (lvl > 0) {
