@@ -93,11 +93,17 @@ public class EnchantManager implements Listener
     @EventHandler
     public void onHit(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker)) return;
+
         ItemStack item = attacker.getInventory().getItemInMainHand();
+        if (item == null || item.getType().isAir()) return;
+
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
 
         for (CustomEnchant enchant : enchants) {
             int level = enchant.getLevel(item);
-            if (level > 0) enchant.onHit(attacker, event, level);
+            if (level > 0) {
+                enchant.onHit(attacker, event, level);
+            }
         }
     }
 
